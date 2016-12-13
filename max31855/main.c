@@ -66,24 +66,47 @@ int main(void)
 		usart_send_char(' '); usart_send_bin_byte(t16>>8); usart_send_char(' '); usart_send_bin_byte(t16);
 		usart_send_char(' '); usart_send_bin_byte(t162>>8); usart_send_char(' '); usart_send_bin_byte(t162);
 
-		usart_send_strP(PSTR(" Tr="));
+		usart_send_strP(PSTR(" Tr_rawInt="));
+		if (tr >= 0) {
+			if (tr<1000) usart_send_char(' ');
+			if (tr<100) usart_send_char(' ');
+			if (tr<10) usart_send_char(' ');
+			usart_send_char('+');
+		} else {
+			if (tr > -10) usart_send_char(' ');
+			if (tr > -100) usart_send_char(' ');
+			if (tr > -1000) usart_send_char(' ');
+		}
 		usart_send_int(tr);
-		usart_send_strP(PSTR(" ("));
-		r = tr & 0x0003;
+		
+
+		usart_send_strP(PSTR(" Tl_rawInt="));
+		if (tl >= 0) {
+			if (tl < 1000) usart_send_char(' ');
+			if (tl < 100) usart_send_char(' ');
+			if (tl < 10) usart_send_char(' ');
+			usart_send_char('+');
+		} else {
+			if (tl > -10) usart_send_char(' ');
+			if (tl > -100) usart_send_char(' ');
+			if (tl > -1000) usart_send_char(' ');
+		}
+		usart_send_int(tl);
+		
+		usart_send_strP(PSTR("  TR="));
+		r = tr & 0x0003; // get value after decimal point
 		r *= 25;
 		tr >>= 2;
 		usart_send_int(tr);
 		usart_send_char('.');
 		if (r == 0) {
 			usart_send_char('0'); usart_send_char('0');
-		} else {
+			} else {
 			usart_send_uint(r);
 		}
 
-		usart_send_strP(PSTR(" Tl="));
-		usart_send_int(tl);
-		usart_send_strP(PSTR(" ("));
-		t16 = tl & 0x000f;
+		usart_send_strP(PSTR("    Tl="));
+		t16 = tl & 0x000f; // extract decimals:
 		t16 *= 625;
 		tl >>= 4;
 		usart_send_int(tl);
@@ -91,9 +114,9 @@ int main(void)
 		if (t16 < 1000) usart_send_char('0');
 		if (t16 < 100) usart_send_char('0');
 		if (t16 < 10) usart_send_char('0');
-		usart_send_uint(t16);
+		usart_send_uint(t16); // decimal point
 		
-		usart_send_char(')');
+		//usart_send_char(')');
 
 		delay1ms(1000); // 1sec delay
 		led_toggle;
